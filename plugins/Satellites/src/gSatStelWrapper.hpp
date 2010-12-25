@@ -1,6 +1,14 @@
 /***************************************************************************
- *   Copyright (C) 2006 by J. L. Canales                                   *
- *   jlcanales@users.sourceforge.net                                       *
+ * Name: gSatStelWrapper.hpp
+ *
+ * Description: Wrapper over gSatTEME class.
+ *              This class allow use Satellite orbit calculation module (gSAt) in
+ *              Stellarium 'native' mode using Stellarium objects.
+ *
+ ***************************************************************************/
+/***************************************************************************
+ *   Copyright (C) 2006 by J.L. Canales                                    *
+ *   jlcanales.gasco@gmail.com                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -18,19 +26,38 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef _STDSAT_H_
-#define _STDSAT_H_ 1
+#ifndef _GSATSTELWRAPPER_HPP_
+#define _GSATSTELWRAPPER_HPP_ 1
 
-static const double KINTERPOLATIONLIMIT=0.0000000000001;
-static const double KMU=3.9861352E5;
-static const double KPI=3.141592654;
-static const double K2PI=6.283185308;
-static const double KEARTHRADIUS=6378.135;
-static const double __f=3.352779E-3;
-static const double KMFACTOR=7.292115E-5;
-static const double KAU=1.4959787066E8; //Km
+#include <QString>
 
-static const double KDEG2RAD  =   KPI / 180.0;   //   0.0174532925199433
-static const double XPDOTP   =  1440.0 / K2PI;  // 229.1831180523293 minutes per radian (earth rotation)
+#include "VecMath.hpp"
+#include "StelNavigator.hpp"
 
-#endif // _STDSAT_H_
+#include "gsatellite/gSatTEME.hpp"
+
+
+class gSatStelWrapper
+{
+
+public:
+	gSatStelWrapper(QString designation, QString tle1,QString tle2);
+	~gSatStelWrapper();
+
+
+	void setEpoch(const StelNavigator*);
+
+	Vec3d getPos();
+	Vec3d getVel();
+	Vec3d getSubPoint();
+
+private:
+	gSatTEME *pSatellite;
+
+};
+
+
+
+
+
+#endif
