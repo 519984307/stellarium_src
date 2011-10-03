@@ -74,9 +74,10 @@ QVariantMap Supernova::getMap(void)
 	return map;
 }
 
-float Supernova::getSelectPriority(const StelCore*) const
+float Supernova::getSelectPriority(const StelCore* core) const
 {
-	return -10.f;
+	//Same as StarWrapper::getSelectPriority()
+	return getVMagnitude(core);
 }
 
 QString Supernova::getInfoString(const StelCore* core, const InfoStringGroup& flags) const
@@ -179,9 +180,9 @@ double Supernova::getAngularSize(const StelCore*) const
 	return 0.00001;
 }
 
-void Supernova::update(double)
+void Supernova::update(double deltaTime)
 {
-	//
+	labelsFader.update((int)(deltaTime*1000));
 }
 
 void Supernova::draw(StelCore* core, StelPainter& painter)
@@ -202,6 +203,9 @@ void Supernova::draw(StelCore* core, StelPainter& painter)
 		painter.setColor(color[0], color[1], color[2], 1);
 		size = getAngularSize(NULL)*M_PI/180.*painter.getProjector()->getPixelPerRadAtCenter();
 		shift = 6.f + size/1.8f;
-		painter.drawText(XYZ, designation, 0, shift, shift, false);
+		if (labelsFader.getInterstate()<=0.f)
+		{
+			painter.drawText(XYZ, designation, 0, shift, shift, false);
+		}
 	}
 }

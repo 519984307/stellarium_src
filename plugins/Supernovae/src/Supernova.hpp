@@ -29,6 +29,7 @@
 #include "StelObject.hpp"
 #include "StelTextureTypes.hpp"
 #include "StelPainter.hpp"
+#include "StelFader.hpp"
 
 class StelPainter;
 
@@ -39,7 +40,7 @@ class StelPainter;
 
 class Supernova : public StelObject
 {
-	friend class Supernovas;
+	friend class Supernovae;
 public:
 	//! @param id The official designation for a supernova, e.g. "SN 1054A"
 	Supernova(const QVariantMap& map);
@@ -95,6 +96,8 @@ private:
 	double snde;			   //! Dec. for the supernova
 	QString note;			   //! Notes for the supernova
 	double distance;		   //! Distance to supernova (10^3 ly)
+
+	LinearFader labelsFader;
 };
 
 #endif // _SUPERNOVA_HPP_
