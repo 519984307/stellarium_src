@@ -1,5 +1,5 @@
 /*
- * Stellarium Pulsars Plug-in GUI
+ * Stellarium Quasars Plug-in GUI
  *
  * Copyright (C) 2012 Alexander Wolf
  *
@@ -25,9 +25,9 @@
 #include <QFileDialog>
 
 #include "StelApp.hpp"
-#include "ui_pulsarsDialog.h"
-#include "PulsarsDialog.hpp"
-#include "Pulsars.hpp"
+#include "ui_quasarsDialog.h"
+#include "QuasarsDialog.hpp"
+#include "Quasars.hpp"
 #include "StelModuleMgr.hpp"
 #include "StelObjectMgr.hpp"
 #include "StelMovementMgr.hpp"
@@ -37,12 +37,12 @@
 #include "StelFileMgr.hpp"
 #include "StelTranslator.hpp"
 
-PulsarsDialog::PulsarsDialog() : updateTimer(NULL)
+QuasarsDialog::QuasarsDialog() : updateTimer(NULL)
 {
-	ui = new Ui_pulsarsDialog;
+	ui = new Ui_quasarsDialog;
 }
 
-PulsarsDialog::~PulsarsDialog()
+QuasarsDialog::~QuasarsDialog()
 {
 	if (updateTimer)
 	{
@@ -53,7 +53,7 @@ PulsarsDialog::~PulsarsDialog()
 	delete ui;
 }
 
-void PulsarsDialog::retranslate()
+void QuasarsDialog::retranslate()
 {
 	if (dialog)
 	{
@@ -64,7 +64,7 @@ void PulsarsDialog::retranslate()
 }
 
 // Initialize the dialog widgets and connect the signals/slots
-void PulsarsDialog::createDialogContent()
+void QuasarsDialog::createDialogContent()
 {
 	ui->setupUi(dialog);
 	ui->tabs->setCurrentIndex(0);	
@@ -72,12 +72,12 @@ void PulsarsDialog::createDialogContent()
 		this, SLOT(retranslate()));
 
 	// Settings tab / updates group
-	ui->displayModeCheckBox->setChecked(GETSTELMODULE(Pulsars)->getDisplayMode());
+	ui->displayModeCheckBox->setChecked(GETSTELMODULE(Quasars)->getDisplayMode());
 	connect(ui->displayModeCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setDistributionEnabled(int)));
 	connect(ui->internetUpdatesCheckbox, SIGNAL(stateChanged(int)), this, SLOT(setUpdatesEnabled(int)));
 	connect(ui->updateButton, SIGNAL(clicked()), this, SLOT(updateJSON()));
-	connect(GETSTELMODULE(Pulsars), SIGNAL(updateStateChanged(Pulsars::UpdateState)), this, SLOT(updateStateReceiver(Pulsars::UpdateState)));
-	connect(GETSTELMODULE(Pulsars), SIGNAL(jsonUpdateComplete(void)), this, SLOT(updateCompleteReceiver(void)));
+	connect(GETSTELMODULE(Quasars), SIGNAL(updateStateChanged(Quasars::UpdateState)), this, SLOT(updateStateReceiver(Quasars::UpdateState)));
+	connect(GETSTELMODULE(Quasars), SIGNAL(jsonUpdateComplete(void)), this, SLOT(updateCompleteReceiver(void)));
 	connect(ui->updateFrequencySpinBox, SIGNAL(valueChanged(int)), this, SLOT(setUpdateValues(int)));
 	refreshUpdateValues(); // fetch values for last updated and so on
 	// if the state didn't change, setUpdatesEnabled will not be called, so we force it
@@ -102,35 +102,21 @@ void PulsarsDialog::createDialogContent()
 
 }
 
-void PulsarsDialog::setAboutHtml(void)
+void QuasarsDialog::setAboutHtml(void)
 {
 	QString html = "<html><head></head><body>";
-	html += "<h2>" + q_("Pulsars Plug-in") + "</h2><table width=\"90%\">";
-	html += "<tr width=\"30%\"><td><strong>" + q_("Version") + ":</strong></td><td>" + PULSARS_PLUGIN_VERSION + "</td></tr>";
+	html += "<h2>" + q_("Quasars Plug-in") + "</h2><table width=\"90%\">";
+	html += "<tr width=\"30%\"><td><strong>" + q_("Version") + ":</strong></td><td>" + QUASARS_PLUGIN_VERSION + "</td></tr>";
 	html += "<tr><td><strong>" + q_("Author") + ":</strong></td><td>Alexander Wolf &lt;alex.v.wolf@gmail.com&gt;</td></tr>";
 	html += "</table>";
 
-	html += "<p>" + q_("This plugin plots the position of various pulsars, with object information about each one.") + "</p>";
-	html += "<p>" + QString(q_("Pulsar data is derived from 'The ATNF Pulsar Catalogue'  (Manchester, R. N., Hobbs, G. B., Teoh, A. & Hobbs, M., Astron. J., 129, 1993-2006 (2005) (%1astro-ph/0412641%2))."))
-			.arg("<a href=\"http://arxiv.org/abs/astro-ph/0412641\">")
-			.arg("</a>") + "</p>";
-	html += "<p>" + QString("<strong>%1:</strong> %2")
-			.arg(q_("Note"))
-			.arg(q_("pulsar identifiers have the prefix 'PSR'")) + "</p>";
-	html += "<h3>" + q_("Acknowledgment") + "</h3>";
-	html += "<p>" + q_("We thank the following people for their contribution and of the valuable comments:") + "</p><ul>";
-	html += "<li>" + QString("%1 (<a href='%2'>%3</a> %4)")
-			.arg(q_("Vladimir Samodourov"))
-			.arg("http://www.prao.ru/")
-			.arg(q_("Pushchino Radio Astronomy Observatory"))
-			.arg(q_("in Russia")) + "</li>";
-	html += "<li>" + QString("%1 (<a href='%2'>%3</a> %4)")
-			.arg(q_("Maciej Serylak"))
-			.arg("http://www.obs-nancay.fr/")
-			.arg(q_("Nancay Radioastronomical Observatory"))
-			.arg(q_("in France")) + "</li>";
+	html += QString("<p>%1 (<a href=\"%2\">%3</a>)</p>")
+			.arg(q_("The Quasars plugin provides visualization of some quasars brighter than 16 visual magnitude. A catalogue of quasars compiled from \"Quasars and Active Galactic Nuclei\" (13th Ed.)"))
+			.arg("http://adsabs.harvard.edu/abs/2010A%26A...518A..10V")
+			.arg(q_("Veron+ 2010"));
+
 	html += "</ul><h3>" + q_("Links") + "</h3>";
-	html += "<p>" + QString(q_("Support is provided via the Launchpad website.  Be sure to put \"%1\" in the subject when posting.")).arg("Pulsars plugin") + "</p>";
+	html += "<p>" + QString(q_("Support is provided via the Launchpad website.  Be sure to put \"%1\" in the subject when posting.")).arg("Quasars plugin") + "</p>";
 	html += "<p><ul>";
 	// TRANSLATORS: The numbers contain the opening and closing tag of an HTML link
 	html += "<li>" + QString(q_("If you have a question, you can %1get an answer here%2").arg("<a href=\"https://answers.launchpad.net/stellarium\">")).arg("</a>") + "</li>";
@@ -139,7 +125,7 @@ void PulsarsDialog::setAboutHtml(void)
 	// TRANSLATORS: The numbers contain the opening and closing tag of an HTML link
 	html += "<li>" + q_("If you would like to make a feature request, you can create a bug report, and set the severity to \"wishlist\".") + "</li>";
 	// TRANSLATORS: The numbers contain the opening and closing tag of an HTML link
-	html += "<li>" + q_("If you want read full information about plugin, his history and format of catalog you can %1get info here%2.").arg("<a href=\"http://stellarium.org/wiki/index.php/Pulsars_plugin\">").arg("</a>") + "</li>";
+	html += "<li>" + q_("If you want read full information about plugin, his history and format of catalog you can %1get info here%2.").arg("<a href=\"http://stellarium.org/wiki/index.php/Quasars_plugin\">").arg("</a>") + "</li>";
 	html += "</ul></p></body></html>";
 
 	StelGui* gui = dynamic_cast<StelGui*>(StelApp::getInstance().getGui());
@@ -150,15 +136,15 @@ void PulsarsDialog::setAboutHtml(void)
 	ui->aboutTextBrowser->setHtml(html);
 }
 
-void PulsarsDialog::refreshUpdateValues(void)
+void QuasarsDialog::refreshUpdateValues(void)
 {
-	ui->lastUpdateDateTimeEdit->setDateTime(GETSTELMODULE(Pulsars)->getLastUpdate());
-	ui->updateFrequencySpinBox->setValue(GETSTELMODULE(Pulsars)->getUpdateFrequencyDays());
-	int secondsToUpdate = GETSTELMODULE(Pulsars)->getSecondsToUpdate();
-	ui->internetUpdatesCheckbox->setChecked(GETSTELMODULE(Pulsars)->getUpdatesEnabled());
-	if (!GETSTELMODULE(Pulsars)->getUpdatesEnabled())
+	ui->lastUpdateDateTimeEdit->setDateTime(GETSTELMODULE(Quasars)->getLastUpdate());
+	ui->updateFrequencySpinBox->setValue(GETSTELMODULE(Quasars)->getUpdateFrequencyDays());
+	int secondsToUpdate = GETSTELMODULE(Quasars)->getSecondsToUpdate();
+	ui->internetUpdatesCheckbox->setChecked(GETSTELMODULE(Quasars)->getUpdatesEnabled());
+	if (!GETSTELMODULE(Quasars)->getUpdatesEnabled())
 		ui->nextUpdateLabel->setText(q_("Internet updates disabled"));
-	else if (GETSTELMODULE(Pulsars)->getUpdateState() == Pulsars::Updating)
+	else if (GETSTELMODULE(Quasars)->getUpdateState() == Quasars::Updating)
 		ui->nextUpdateLabel->setText(q_("Updating now..."));
 	else if (secondsToUpdate <= 60)
 		ui->nextUpdateLabel->setText(q_("Next update: < 1 minute"));
@@ -170,16 +156,16 @@ void PulsarsDialog::refreshUpdateValues(void)
 		ui->nextUpdateLabel->setText(QString(q_("Next update: %1 days")).arg((secondsToUpdate/86400)+1));
 }
 
-void PulsarsDialog::setUpdateValues(int days)
+void QuasarsDialog::setUpdateValues(int days)
 {
-	GETSTELMODULE(Pulsars)->setUpdateFrequencyDays(days);
+	GETSTELMODULE(Quasars)->setUpdateFrequencyDays(days);
 	refreshUpdateValues();
 }
 
-void PulsarsDialog::setUpdatesEnabled(int checkState)
+void QuasarsDialog::setUpdatesEnabled(int checkState)
 {
 	bool b = checkState != Qt::Unchecked;
-	GETSTELMODULE(Pulsars)->setUpdatesEnabled(b);
+	GETSTELMODULE(Quasars)->setUpdatesEnabled(b);
 	ui->updateFrequencySpinBox->setEnabled(b);
 	if(b)
 		ui->updateButton->setText(q_("Update now"));
@@ -189,57 +175,57 @@ void PulsarsDialog::setUpdatesEnabled(int checkState)
 	refreshUpdateValues();
 }
 
-void PulsarsDialog::setDistributionEnabled(int checkState)
+void QuasarsDialog::setDistributionEnabled(int checkState)
 {
 	bool b = checkState != Qt::Unchecked;
-	GETSTELMODULE(Pulsars)->setDisplayMode(b);
+	GETSTELMODULE(Quasars)->setDisplayMode(b);
 }
 
-void PulsarsDialog::updateStateReceiver(Pulsars::UpdateState state)
+void QuasarsDialog::updateStateReceiver(Quasars::UpdateState state)
 {
-	//qDebug() << "PulsarsDialog::updateStateReceiver got a signal";
-	if (state==Pulsars::Updating)
+	//qDebug() << "QuasarsDialog::updateStateReceiver got a signal";
+	if (state==Quasars::Updating)
 		ui->nextUpdateLabel->setText(q_("Updating now..."));
-	else if (state==Pulsars::DownloadError || state==Pulsars::OtherError)
+	else if (state==Quasars::DownloadError || state==Quasars::OtherError)
 	{
 		ui->nextUpdateLabel->setText(q_("Update error"));
 		updateTimer->start();  // make sure message is displayed for a while...
 	}
 }
 
-void PulsarsDialog::updateCompleteReceiver(void)
+void QuasarsDialog::updateCompleteReceiver(void)
 {
-	ui->nextUpdateLabel->setText(QString(q_("Pulsars is updated")));
+	ui->nextUpdateLabel->setText(QString(q_("Quasars is updated")));
 	// display the status for another full interval before refreshing status
 	updateTimer->start();
-	ui->lastUpdateDateTimeEdit->setDateTime(GETSTELMODULE(Pulsars)->getLastUpdate());
+	ui->lastUpdateDateTimeEdit->setDateTime(GETSTELMODULE(Quasars)->getLastUpdate());
 	QTimer *timer = new QTimer(this);
 	connect(timer, SIGNAL(timeout()), this, SLOT(refreshUpdateValues()));
 }
 
-void PulsarsDialog::restoreDefaults(void)
+void QuasarsDialog::restoreDefaults(void)
 {
-	qDebug() << "Pulsars::restoreDefaults";
-	GETSTELMODULE(Pulsars)->restoreDefaults();
-	GETSTELMODULE(Pulsars)->readSettingsFromConfig();
+	qDebug() << "Quasars::restoreDefaults";
+	GETSTELMODULE(Quasars)->restoreDefaults();
+	GETSTELMODULE(Quasars)->readSettingsFromConfig();
 	updateGuiFromSettings();
 }
 
-void PulsarsDialog::updateGuiFromSettings(void)
+void QuasarsDialog::updateGuiFromSettings(void)
 {
-	ui->internetUpdatesCheckbox->setChecked(GETSTELMODULE(Pulsars)->getUpdatesEnabled());
+	ui->internetUpdatesCheckbox->setChecked(GETSTELMODULE(Quasars)->getUpdatesEnabled());
 	refreshUpdateValues();
 }
 
-void PulsarsDialog::saveSettings(void)
+void QuasarsDialog::saveSettings(void)
 {
-	GETSTELMODULE(Pulsars)->saveSettingsToConfig();
+	GETSTELMODULE(Quasars)->saveSettingsToConfig();
 }
 
-void PulsarsDialog::updateJSON(void)
+void QuasarsDialog::updateJSON(void)
 {
-	if(GETSTELMODULE(Pulsars)->getUpdatesEnabled())
+	if(GETSTELMODULE(Quasars)->getUpdatesEnabled())
 	{
-		GETSTELMODULE(Pulsars)->updateJSON();
+		GETSTELMODULE(Quasars)->updateJSON();
 	}
 }
