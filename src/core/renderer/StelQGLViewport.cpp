@@ -1,6 +1,6 @@
 /*
  * Stellarium
- * Copyright (C) 2009 Fabien Chereau
+ * Copyright (C) 2012 Ferdinand Majerech
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,24 +17,14 @@
  * Foundation, Inc., 51 Franklin Street, Suite 500, Boston, MA  02110-1335, USA.
  */
 
-#ifndef _TESTSTELVERTEXARRAY_HPP_
-#define _TESTSTELVERTEXARRAY_HPP_
+#include "StelQGLRenderer.hpp"
+#include "StelQGLTextureBackend.hpp"
+#include "StelQGLViewport.hpp"
 
-#include <QObject>
-#include <QtTest>
-
-#include "StelVertexArray.hpp"
-
-class TestStelVertexArray : public QObject
+StelTextureBackend* StelQGLViewport::getViewportTextureBackend(StelQGLRenderer* renderer)
 {
-Q_OBJECT
-private slots:
-	void initTestCase();
-	void benchmarkForeachTriangleNoOp();
-	void benchmarkForeachTriangle();
-	void benchmarkForeachTriangleDirect();
-private:
-	StelVertexArray array;
-};
-
-#endif // _TESTSTELVERTEXARRAY_HPP_
+	return useFBO() 
+		? StelQGLTextureBackend::fromFBO(renderer, frontBuffer)
+		: StelQGLTextureBackend::fromViewport(renderer, getViewportSize(), 
+		                                      renderer->getGLContext()->format());
+}
