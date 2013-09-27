@@ -1,7 +1,7 @@
 /*
- * Stellarium Historical Supernovae Plug-in GUI
+ * Stellarium Novae Plug-in GUI
  *
- * Copyright (C) 2012 Alexander Wolf
+ * Copyright (C) 2013 Alexander Wolf
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -25,24 +25,23 @@
 #include <QFileDialog>
 
 #include "StelApp.hpp"
-#include "ui_supernovaeDialog.h"
-#include "SupernovaeDialog.hpp"
-#include "Supernovae.hpp"
+#include "ui_novaeDialog.h"
+#include "NovaeDialog.hpp"
+#include "Novae.hpp"
 #include "StelModuleMgr.hpp"
 #include "StelObjectMgr.hpp"
 #include "StelMovementMgr.hpp"
 #include "StelStyle.hpp"
 #include "StelGui.hpp"
-#include "StelMainView.hpp"
 #include "StelFileMgr.hpp"
 #include "StelTranslator.hpp"
 
-SupernovaeDialog::SupernovaeDialog() : updateTimer(NULL)
+NovaeDialog::NovaeDialog() : updateTimer(NULL)
 {
-	ui = new Ui_supernovaeDialog;
+	ui = new Ui_novaeDialog;
 }
 
-SupernovaeDialog::~SupernovaeDialog()
+NovaeDialog::~NovaeDialog()
 {
 	if (updateTimer)
 	{
@@ -53,7 +52,7 @@ SupernovaeDialog::~SupernovaeDialog()
 	delete ui;
 }
 
-void SupernovaeDialog::retranslate()
+void NovaeDialog::retranslate()
 {
 	if (dialog)
 	{
@@ -64,7 +63,7 @@ void SupernovaeDialog::retranslate()
 }
 
 // Initialize the dialog widgets and connect the signals/slots
-void SupernovaeDialog::createDialogContent()
+void NovaeDialog::createDialogContent()
 {
 	ui->setupUi(dialog);
 	ui->tabs->setCurrentIndex(0);	
@@ -74,8 +73,8 @@ void SupernovaeDialog::createDialogContent()
 	// Settings tab / updates group
 	connect(ui->internetUpdatesCheckbox, SIGNAL(stateChanged(int)), this, SLOT(setUpdatesEnabled(int)));
 	connect(ui->updateButton, SIGNAL(clicked()), this, SLOT(updateJSON()));
-	connect(GETSTELMODULE(Supernovae), SIGNAL(updateStateChanged(Supernovae::UpdateState)), this, SLOT(updateStateReceiver(Supernovae::UpdateState)));
-	connect(GETSTELMODULE(Supernovae), SIGNAL(jsonUpdateComplete(void)), this, SLOT(updateCompleteReceiver(void)));
+	connect(GETSTELMODULE(Novae), SIGNAL(updateStateChanged(Novae::UpdateState)), this, SLOT(updateStateReceiver(Novae::UpdateState)));
+	connect(GETSTELMODULE(Novae), SIGNAL(jsonUpdateComplete(void)), this, SLOT(updateCompleteReceiver(void)));
 	connect(ui->updateFrequencySpinBox, SIGNAL(valueChanged(int)), this, SLOT(setUpdateValues(int)));
 	refreshUpdateValues(); // fetch values for last updated and so on
 	// if the state didn't change, setUpdatesEnabled will not be called, so we force it
@@ -100,30 +99,25 @@ void SupernovaeDialog::createDialogContent()
 
 }
 
-void SupernovaeDialog::setAboutHtml(void)
+void NovaeDialog::setAboutHtml(void)
 {
 	QString html = "<html><head></head><body>";
-	html += "<h2>" + q_("Historical Supernovae Plug-in") + "</h2><table width=\"90%\">";
-	html += "<tr width=\"30%\"><td><strong>" + q_("Version") + ":</strong></td><td>" + SUPERNOVAE_PLUGIN_VERSION + "</td></tr>";
+	html += "<h2>" + q_("Bright Novae Plug-in") + "</h2><table width=\"90%\">";
+	html += "<tr width=\"30%\"><td><strong>" + q_("Version") + ":</strong></td><td>" + NOVAE_PLUGIN_VERSION + "</td></tr>";
 	html += "<tr><td><strong>" + q_("Author") + ":</strong></td><td>Alexander Wolf &lt;alex.v.wolf@gmail.com&gt;</td></tr>";
 	html += "</table>";
 
-	html += "<p>" + q_("This plugin allows you to see some bright historical supernovae: ");
-	html += GETSTELMODULE(Supernovae)->getSupernovaeList();
-	html += ". " + q_("All those supernovae are brighter %1 at peak of brightness.").arg(QString::number(GETSTELMODULE(Supernovae)->getLowerLimitBrightness(), 'f', 2) + "<sup>m</sup>") + "</p>";
+	html += "<p>" + q_("A plugin that shows some bright novae in the Milky Way galaxy.");
+	html += " " + q_("You can find novae via search tool by entering designation of nova or its common name (e.g. 'Nova Cygni 1975' or 'V1500 Cyg').") + "</p>";
 
 	html += "<h3>" + q_("Light curves") + "</h3>";
-	html += "<p>" + QString(q_("This plugin implements a simple model of light curves for different supernovae. Typical views of light curves for type I and type II supernova can be seen %1here%2 (right scale in days), and this model is used for this plugin.")).arg("<a href=\"http://stellarium.org/wiki/index.php/Historical_Supernovae_plugin#Light_curves\">").arg("</a>") + "</p>";
+	html += q_("This plugin uses a very simple model for calculation of light curves for novae stars.") + " ";
+	html += q_("This model is based on time for decay by %1 magnitudes from the maximum value, where %1 is 2, 3, 6 and 9.").arg("<em>N</em>") + " ";
+	html += q_("If a nova has no values for decay of magnitude then this plugin will use generalized values for it.");
+	html += "<p>";
 
-	html += "<h3>" + q_("Acknowledgments") + "</h3>";
-	html += "<p>" + q_("We thank the following people for their contribution and valuable comments:") + "</p><ul>";
-	html += "<li>" + QString("%1 (<a href='%2'>%3</a> %4)")
-			.arg(q_("Sergei Blinnikov"))
-			.arg("http://www.itep.ru/")
-			.arg(q_("Institute for Theoretical and Experimental Physics"))
-			.arg(q_("in Russia")) + "</li>";
-	html += "</ul><h3>" + q_("Links") + "</h3>";
-	html += "<p>" + QString(q_("Support is provided via the Launchpad website.  Be sure to put \"%1\" in the subject when posting.")).arg("Historical Supernovae plugin") + "</p>";
+	html += "<h3>" + q_("Links") + "</h3>";
+	html += "<p>" + QString(q_("Support is provided via the Launchpad website.  Be sure to put \"%1\" in the subject when posting.")).arg("Bright Novae plugin") + "</p>";
 	html += "<p><ul>";
 	// TRANSLATORS: The numbers contain the opening and closing tag of an HTML link
 	html += "<li>" + QString(q_("If you have a question, you can %1get an answer here%2").arg("<a href=\"https://answers.launchpad.net/stellarium\">")).arg("</a>") + "</li>";
@@ -132,7 +126,7 @@ void SupernovaeDialog::setAboutHtml(void)
 	// TRANSLATORS: The numbers contain the opening and closing tag of an HTML link
 	html += "<li>" + q_("If you would like to make a feature request, you can create a bug report, and set the severity to \"wishlist\".") + "</li>";
 	// TRANSLATORS: The numbers contain the opening and closing tag of an HTML link
-	html += "<li>" + q_("If you want to read full information about this plugin, its history and format of catalog, you can %1get info here%2.").arg("<a href=\"http://stellarium.org/wiki/index.php/Historical_Supernovae_plugin\">").arg("</a>") + "</li>";
+	html += "<li>" + q_("If you want to read full information about this plugin, its history and catalog format, you can %1get info here%2.").arg("<a href=\"http://stellarium.org/wiki/index.php/Bright_Novae_plugin\">").arg("</a>") + "</li>";
 	html += "</ul></p></body></html>";
 
 	StelGui* gui = dynamic_cast<StelGui*>(StelApp::getInstance().getGui());
@@ -143,15 +137,15 @@ void SupernovaeDialog::setAboutHtml(void)
 	ui->aboutTextBrowser->setHtml(html);
 }
 
-void SupernovaeDialog::refreshUpdateValues(void)
+void NovaeDialog::refreshUpdateValues(void)
 {
-	ui->lastUpdateDateTimeEdit->setDateTime(GETSTELMODULE(Supernovae)->getLastUpdate());
-	ui->updateFrequencySpinBox->setValue(GETSTELMODULE(Supernovae)->getUpdateFrequencyDays());
-	int secondsToUpdate = GETSTELMODULE(Supernovae)->getSecondsToUpdate();
-	ui->internetUpdatesCheckbox->setChecked(GETSTELMODULE(Supernovae)->getUpdatesEnabled());
-	if (!GETSTELMODULE(Supernovae)->getUpdatesEnabled())
+	ui->lastUpdateDateTimeEdit->setDateTime(GETSTELMODULE(Novae)->getLastUpdate());
+	ui->updateFrequencySpinBox->setValue(GETSTELMODULE(Novae)->getUpdateFrequencyDays());
+	int secondsToUpdate = GETSTELMODULE(Novae)->getSecondsToUpdate();
+	ui->internetUpdatesCheckbox->setChecked(GETSTELMODULE(Novae)->getUpdatesEnabled());
+	if (!GETSTELMODULE(Novae)->getUpdatesEnabled())
 		ui->nextUpdateLabel->setText(q_("Internet updates disabled"));
-	else if (GETSTELMODULE(Supernovae)->getUpdateState() == Supernovae::Updating)
+	else if (GETSTELMODULE(Novae)->getUpdateState() == Novae::Updating)
 		ui->nextUpdateLabel->setText(q_("Updating now..."));
 	else if (secondsToUpdate <= 60)
 		ui->nextUpdateLabel->setText(q_("Next update: < 1 minute"));
@@ -163,16 +157,16 @@ void SupernovaeDialog::refreshUpdateValues(void)
 		ui->nextUpdateLabel->setText(QString(q_("Next update: %1 days")).arg((secondsToUpdate/86400)+1));
 }
 
-void SupernovaeDialog::setUpdateValues(int days)
+void NovaeDialog::setUpdateValues(int days)
 {
-	GETSTELMODULE(Supernovae)->setUpdateFrequencyDays(days);
+	GETSTELMODULE(Novae)->setUpdateFrequencyDays(days);
 	refreshUpdateValues();
 }
 
-void SupernovaeDialog::setUpdatesEnabled(int checkState)
+void NovaeDialog::setUpdatesEnabled(int checkState)
 {
 	bool b = checkState != Qt::Unchecked;
-	GETSTELMODULE(Supernovae)->setUpdatesEnabled(b);
+	GETSTELMODULE(Novae)->setUpdatesEnabled(b);
 	ui->updateFrequencySpinBox->setEnabled(b);
 	if(b)
 		ui->updateButton->setText(q_("Update now"));
@@ -182,51 +176,51 @@ void SupernovaeDialog::setUpdatesEnabled(int checkState)
 	refreshUpdateValues();
 }
 
-void SupernovaeDialog::updateStateReceiver(Supernovae::UpdateState state)
+void NovaeDialog::updateStateReceiver(Novae::UpdateState state)
 {
-	//qDebug() << "SupernovaeDialog::updateStateReceiver got a signal";
-	if (state==Supernovae::Updating)
+	//qDebug() << "NovaeDialog::updateStateReceiver got a signal";
+	if (state==Novae::Updating)
 		ui->nextUpdateLabel->setText(q_("Updating now..."));
-	else if (state==Supernovae::DownloadError || state==Supernovae::OtherError)
+	else if (state==Novae::DownloadError || state==Novae::OtherError)
 	{
 		ui->nextUpdateLabel->setText(q_("Update error"));
 		updateTimer->start();  // make sure message is displayed for a while...
 	}
 }
 
-void SupernovaeDialog::updateCompleteReceiver(void)
+void NovaeDialog::updateCompleteReceiver(void)
 {
-	ui->nextUpdateLabel->setText(QString(q_("Historical supernovae is updated")));
+	ui->nextUpdateLabel->setText(QString(q_("Novae is updated")));
 	// display the status for another full interval before refreshing status
 	updateTimer->start();
-	ui->lastUpdateDateTimeEdit->setDateTime(GETSTELMODULE(Supernovae)->getLastUpdate());
+	ui->lastUpdateDateTimeEdit->setDateTime(GETSTELMODULE(Novae)->getLastUpdate());
 	QTimer *timer = new QTimer(this);
 	connect(timer, SIGNAL(timeout()), this, SLOT(refreshUpdateValues()));
 }
 
-void SupernovaeDialog::restoreDefaults(void)
+void NovaeDialog::restoreDefaults(void)
 {
-	qDebug() << "Supernovae::restoreDefaults";
-	GETSTELMODULE(Supernovae)->restoreDefaults();
-	GETSTELMODULE(Supernovae)->readSettingsFromConfig();
+	qDebug() << "Novae::restoreDefaults";
+	GETSTELMODULE(Novae)->restoreDefaults();
+	GETSTELMODULE(Novae)->readSettingsFromConfig();
 	updateGuiFromSettings();
 }
 
-void SupernovaeDialog::updateGuiFromSettings(void)
+void NovaeDialog::updateGuiFromSettings(void)
 {
-	ui->internetUpdatesCheckbox->setChecked(GETSTELMODULE(Supernovae)->getUpdatesEnabled());
+	ui->internetUpdatesCheckbox->setChecked(GETSTELMODULE(Novae)->getUpdatesEnabled());
 	refreshUpdateValues();
 }
 
-void SupernovaeDialog::saveSettings(void)
+void NovaeDialog::saveSettings(void)
 {
-	GETSTELMODULE(Supernovae)->saveSettingsToConfig();
+	GETSTELMODULE(Novae)->saveSettingsToConfig();
 }
 
-void SupernovaeDialog::updateJSON(void)
+void NovaeDialog::updateJSON(void)
 {
-	if(GETSTELMODULE(Supernovae)->getUpdatesEnabled())
+	if(GETSTELMODULE(Novae)->getUpdatesEnabled())
 	{
-		GETSTELMODULE(Supernovae)->updateJSON();
+		GETSTELMODULE(Novae)->updateJSON();
 	}
 }

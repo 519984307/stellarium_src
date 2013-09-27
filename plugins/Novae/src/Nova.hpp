@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Alexander Wolf
+ * Copyright (C) 2013 Alexander Wolf
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,8 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Suite 500, Boston, MA  02110-1335, USA.
  */
 
-#ifndef _SUPERNOVA_HPP_
-#define _SUPERNOVA_HPP_ 1
+#ifndef _NOVA_HPP_
+#define _NOVA_HPP_ 1
 
 #include <QVariant>
 #include <QString>
@@ -27,32 +27,31 @@
 #include <QDateTime>
 
 #include "StelObject.hpp"
-#include "StelTextureTypes.hpp"
-#include "StelPainter.hpp"
 #include "StelFader.hpp"
+#include "StelProjectorType.hpp"
 
 class StelPainter;
 
-//! @class Supernova
-//! A Supernova object represents one supernova on the sky.
-//! Details about the supernovas are passed using a QVariant which contains
+//! @class Nova
+//! A Nova object represents one nova on the sky.
+//! Details about the novae are passed using a QVariant which contains
 //! a map of data from the json file.
 
-class Supernova : public StelObject
+class Nova : public StelObject
 {
-	friend class Supernovae;
+	friend class Novae;
 public:
-	//! @param id The official designation for a supernova, e.g. "SN 1054A"
-	Supernova(const QVariantMap& map);
-	~Supernova();
+	//! @param id The official designation for a nova, e.g. "........"
+	Nova(const QVariantMap& map);
+	~Nova();
 
-	//! Get a QVariantMap which describes the supernova.  Could be used to
+	//! Get a QVariantMap which describes the nova.  Could be used to
 	//! create a duplicate.
 	QVariantMap getMap(void);
 
 	virtual QString getType(void) const
 	{
-		return "Supernova";
+		return "Nova";
 	}
 	virtual float getSelectPriority(const StelCore* core) const;
 
@@ -69,6 +68,7 @@ public:
 	virtual double getAngularSize(const StelCore* core) const;
 	virtual QString getNameI18n(void) const;
 	virtual QString getEnglishName(void) const;
+	QString getDesignation(void) const;
 
 	void update(double deltaTime);
 
@@ -77,23 +77,26 @@ private:
 
 	Vec3d XYZ;                         // holds J2000 position
 
-	static StelTextureSP hintTexture;
+	void draw(StelCore* core, StelPainter* painter);
 
-	void draw(StelCore* core, StelPainter& painter);
-
-	// Supernova
-	QString designation;               //! The ID of the supernova
-	QString sntype;			   //! Type of the supernova
-	float maxMagnitude;		   //! Maximal visual magnitude
-	double peakJD;			   //! Julian Day of max. vis. mag.
-	double snra;			   //! R.A. for the supernova
-	double snde;			   //! Dec. for the supernova
-	QString note;			   //! Notes for the supernova
-	double distance;		   //! Distance to supernova (10^3 ly)
+	// Nova
+	QString designation;		//! The ID of the nova
+	QString novaName;		//! Name of the nova
+	QString novaType;		//! Type of the nova
+	float maxMagnitude;		//! Maximal visual magnitude
+	float minMagnitude;		//! Minimal visual magnitude
+	double peakJD;			//! Julian Day of max. vis. mag.
+	int m2;				//! Time to decline by 2mag from maximum
+	int m3;				//! Time to decline by 3mag from maximum
+	int m6;				//! Time to decline by 6mag from maximum
+	int m9;				//! Time to decline by 9mag from maximum
+	double RA;			//! R.A. for the nova
+	double Dec;			//! Dec. for the nova
+	double distance;		//! Distance to nova (10^3 ly)
 
 	LinearFader labelsFader;
 
 	QString getMaxBrightnessDate(const double JD) const;
 };
 
-#endif // _SUPERNOVA_HPP_
+#endif // _NOVA_HPP_
