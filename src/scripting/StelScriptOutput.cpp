@@ -1,6 +1,6 @@
 /*
  * Stellarium
- * Copyright (C) 2013 Alexander Wolf
+ * Copyright (C) 2014 Alexander Wolf
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,22 +17,28 @@
  * Foundation, Inc., 51 Franklin Street, Suite 500, Boston, MA  02110-1335, USA.
  */
 
-#ifndef _TESTCONVERSIONS_HPP_
-#define _TESTCONVERSIONS_HPP_
+#include "StelScriptOutput.hpp"
+#include <QDebug>
 
-#include <QObject>
-#include <QTest>
+// Init statics variables.
+QFile StelScriptOutput::outputFile;
+QString StelScriptOutput::outputText;
 
-class TestConversions : public QObject
+void StelScriptOutput::init(const QString& outputFilePath)
 {
-Q_OBJECT
-private slots:
-	void testHMSToRad();
-	void testDMSToRad();
-	void testRadToHMS();
-	void testRadToDMS();
-	void testDDToDMS();
-};
+	outputFile.setFileName(outputFilePath);
+	if (!outputFile.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text | QIODevice::Unbuffered))
+		qDebug() << "ERROR: Cannot open output.txt file";
+}
 
-#endif // _TESTCONVERSIONS_HPP_
+void StelScriptOutput::deinit()
+{
+	outputFile.close();
+}
 
+void StelScriptOutput::writeLog(QString msg)
+{
+	msg += "\n";
+	outputFile.write(qPrintable(msg), msg.size());
+	outputText += msg;
+}
