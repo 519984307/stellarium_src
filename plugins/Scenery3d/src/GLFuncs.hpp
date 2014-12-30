@@ -23,18 +23,17 @@
 
 #include <QOpenGLContext>
 
-//! Defines some OpenGL extension functions not resolved through QOpenGLFunctions or StelOpenGL.
-//! This could be solved through the QOpenGLExtensions module, but I dont want to add another library to the whole
-//! Stellarium app if we require only 1-2 extensions.
+//! Defines some OpenGL functions not resolved through StelOpenGL, needed for Geometry shader
+//! Using the QOpenGLFunctions_*_* would solve this better, but it conflicts with the
+//! current StelOpenGL header dramatically.
 struct GLExtFuncs
 {
-	PFNGLFRAMEBUFFERTEXTUREARBPROC glFramebufferTextureARB;
-	PFNGLPROGRAMPARAMETERIARBPROC glProgramParameteriARB;
+	//! Since 3.2
+	PFNGLFRAMEBUFFERTEXTUREPROC glFramebufferTexture;
 
 	void init(QOpenGLContext* ctx)
 	{
-		glFramebufferTextureARB = (PFNGLFRAMEBUFFERTEXTUREARBPROC)ctx->getProcAddress("glFramebufferTextureARB");
-		glProgramParameteriARB = (PFNGLPROGRAMPARAMETERIARBPROC)ctx->getProcAddress("glProgramParameteriARB");
+		glFramebufferTexture = (PFNGLFRAMEBUFFERTEXTUREPROC)ctx->getProcAddress("glFramebufferTexture");
 	}
 };
 
