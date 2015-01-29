@@ -1,6 +1,6 @@
 /*
  * Stellarium
- * Copyright (C) 2010 Matthew Gates
+ * Copyright (C) 2015 Alexander Wolf
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -14,25 +14,22 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Suite 500, Boston, MA  02110-1335, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef _TESTDELTAT_HPP_
-#define _TESTDELTAT_HPP_
+#ifndef _TESTEXTINCTION_HPP_
+#define _TESTEXTINCTION_HPP_
 
 #include <QObject>
-#include <QTest>
-#include <QVector>
-#include <QString>
+#include <QtTest>
+#include "RefractionExtinction.hpp"
 
-class TestDeltaT : public QObject
+class TestExtinction : public QObject
 {
-Q_OBJECT
+	Q_OBJECT
 private slots:
 	void initTestCase();
-	void testDeltaTByEspenakMeeus();
-
+	void testBase();	
 };
 
-#endif // _TESTDELTAT_HPP_
-
+#endif // _TESTEXTINCTION_HPP_
