@@ -1,6 +1,6 @@
 /*
- * Stellarium
- * Copyright (C) 2010 Matthew Gates
+ * Stellarium 
+ * Copyright (C) 2015 Alexander Wolf
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -14,25 +14,32 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Suite 500, Boston, MA  02110-1335, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef _TESTDELTAT_HPP_
-#define _TESTDELTAT_HPP_
-
 #include <QObject>
-#include <QTest>
-#include <QVector>
-#include <QString>
+#include <QtDebug>
+#include <QtTest>
 
-class TestDeltaT : public QObject
+#include "tests/testExtinction.hpp"
+
+QTEST_MAIN(TestExtinction)
+
+void TestExtinction::initTestCase()
 {
-Q_OBJECT
-private slots:
-	void initTestCase();
-	void testDeltaTByEspenakMeeus();
+}
 
-};
+void TestExtinction::testBase()
+{
+	Extinction extCls;
+	Vec3d v(1.,0.,0.);
+	float mag=4.f;
+	extCls.forward(v, &mag);
+	QVERIFY(mag>=4.);
 
-#endif // _TESTDELTAT_HPP_
-
+	Vec3d vert(0.,0.,1.);
+	mag=2.0f;
+	extCls.setExtinctionCoefficient(0.25);
+	extCls.forward(vert, &mag);
+	QVERIFY(mag==2.25);
+}
