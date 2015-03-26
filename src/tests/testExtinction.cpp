@@ -1,32 +1,45 @@
 /*
- * Stellarium
- * Copyright (C) 2009 Fabien Chereau
- * 
+ * Stellarium 
+ * Copyright (C) 2015 Alexander Wolf
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Suite 500, Boston, MA  02110-1335, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#include "StelNoGui.hpp"
-#include <QProgressBar>
+#include <QObject>
+#include <QtDebug>
+#include <QtTest>
 
-StelGuiBase* StelNoGuiPluginInterface::getStelGuiBase() const
+#include "tests/testExtinction.hpp"
+
+QTEST_MAIN(TestExtinction)
+
+void TestExtinction::initTestCase()
 {
-	return new StelNoGui();
 }
-Q_EXPORT_PLUGIN2(StelGui, StelNoGuiPluginInterface)
 
-QProgressBar* StelNoGui::addProgressBar()
+void TestExtinction::testBase()
 {
-	return new QProgressBar();
+	Extinction extCls;
+	Vec3d v(1.,0.,0.);
+	float mag=4.f;
+	extCls.forward(v, &mag);
+	QVERIFY(mag>=4.);
+
+	Vec3d vert(0.,0.,1.);
+	mag=2.0f;
+	extCls.setExtinctionCoefficient(0.25);
+	extCls.forward(vert, &mag);
+	QVERIFY(mag==2.25);
 }
